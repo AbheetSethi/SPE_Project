@@ -7,8 +7,13 @@ from django.views.decorators.csrf import csrf_exempt
 from keras.layers import TFSMLayer
 
 # Load Model using TFSMLayer (since it's a SavedModel format not supported by Keras 3 directly)
+# retrieved_model = TFSMLayer(
+#     "/home/abheet/.cache/huggingface/hub/models--Madhu45--Teledermatology_model/snapshots/db0ea0c01c086c92d9911209d57cf20ad0c83827",
+#     call_endpoint="serving_default"
+# )
+
 retrieved_model = TFSMLayer(
-    "/home/abheet/.cache/huggingface/hub/models--Madhu45--Teledermatology_model/snapshots/db0ea0c01c086c92d9911209d57cf20ad0c83827",
+    "/home/abheet/.cache/huggingface/hub/models--AbheetSethi--Teledermatology_model/snapshots/ddf13fc612dbd08e1b7861746743aa6800b15020",
     call_endpoint="serving_default"
 )
 print("Model Loaded.")
