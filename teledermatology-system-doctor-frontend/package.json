@@ -1,0 +1,61 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@material-ui/core": "^4.12.4",
+    "@material-ui/icons": "^4.11.3",
+    "@material-ui/styles": "^4.11.5",
+    "@mui-treasury/styles": "^1.13.1",
+    "@mui/icons-material": "^5.17.1",
+    "@mui/joy": "latest",
+    "@mui/material": "^5.17.1",
+    "@mui/styled-engine": "^5.11.9",
+    "@mui/utils": "^5.12.0",
+    "@mui/x-data-grid": "^6.2.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.8.4",
+    "moment": "^2.29.4",
+    "prop-types": "latest",
+    "react": "^18.2.0",
+    "react-calendar": "^4.2.1",
+    "react-dom": "^18.2.0",
+    "react-modal-image": "^2.6.0",
+    "react-router-dom": "^6.8.1",
+    "react-scripts": "5.0.1",
+    "react-toastify": "^9.1.1",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "set PORT=3000 && react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "description": "https://github.com/mui/material-ui/blob/v5.11.14/docs/data/joy/components/table/TableSortAndSelection.js",
+  "devDependencies": {
+    "react-scripts": "latest"
+  }
+}

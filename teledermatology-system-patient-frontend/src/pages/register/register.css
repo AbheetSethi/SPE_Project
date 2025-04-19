@@ -1,0 +1,32 @@
+.register-container {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .register-paper {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .register-icon {
+    background-color: #4051B5;
+    border-radius: 50%;
+    padding: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .register-form {
+    width: 100%;
+    margin-top: 8px;
+  }
+  
+  .register-button {
+    margin-top: 16px;
+    margin-bottom: 8px;
+    background-color: #4051B5;
+  }
+  
