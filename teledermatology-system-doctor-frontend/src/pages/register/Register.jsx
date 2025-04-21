@@ -24,7 +24,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 
 const StyledAvatar = styled(Avatar)(({ theme }) => ({
   margin: theme.spacing(1),
-  backgroundColor: '#2e7d32', // A hospital green shade
+  backgroundColor: '#1976d2', // Match the blue from sign-in
 }));
 
 export default function Register() {
@@ -34,17 +34,19 @@ export default function Register() {
         <StyledAvatar>
           <PersonAddIcon />
         </StyledAvatar>
-        <Typography component="h1" variant="h5" fontWeight="600" color="primary">
-          Doctor Registration
+        <Typography component="h1" variant="h5" fontWeight="600" color="primary" sx={{ color: '#1976d2' }}>
+          Patient Registration
         </Typography>
         <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
-          Join the DermaCare Network
+          Sign up for your DermaCare account
         </Typography>
         <Box component="form" noValidate sx={{ mt: 1 }}>
           <Grid container spacing={2}>
+            {/* Optional: Add Patient ID if needed
             <Grid item xs={12}>
-              <TextField fullWidth label="Doctor ID" name="doctorId" required />
+              <TextField fullWidth label="Patient ID" name="patientId" required />
             </Grid>
+            */}
             <Grid item xs={12} sm={6}>
               <TextField fullWidth label="First Name" name="firstName" required />
             </Grid>
@@ -52,7 +54,7 @@ export default function Register() {
               <TextField fullWidth label="Last Name" name="lastName" required />
             </Grid>
             <Grid item xs={12}>
-              <TextField fullWidth label="Email" name="email" type="email" required />
+              <TextField fullWidth label="Email Address" name="email" type="email" required />
             </Grid>
             <Grid item xs={12}>
               <TextField fullWidth label="Password" name="password" type="password" required />
@@ -62,7 +64,12 @@ export default function Register() {
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mt: 3, borderRadius: 2 }}
+            sx={{
+              mt: 3,
+              borderRadius: 2,
+              backgroundColor: '#1976d2',
+              '&:hover': { backgroundColor: '#1565c0' }
+            }}
           >
             Register
           </Button>

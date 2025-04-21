@@ -17,7 +17,7 @@ import {
   Grid,
 } from "@mui/material";
 import moment from "moment";
-import Navbar from "../../components/navbar/Navbar";
+import HomeNavbar from '../../components/navbar/HomeNavbar';
 import { toast } from "react-toastify";
 import viewall from "../../services/Viewall";
 import fetchImage from "../../services/Fetchimage";
@@ -30,7 +30,6 @@ const ViewDiagnosis = () => {
   const [imageData, setImageData] = useState("");
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-
   const modalStyle = {
     position: "absolute",
     top: "50%",
@@ -110,7 +109,7 @@ const ViewDiagnosis = () => {
 
   return (
     <>
-      <Navbar />
+      <HomeNavbar />
       <Container maxWidth="lg" sx={{ mt: 5, mb: 5 }}>
         <Typography
           variant="h4"

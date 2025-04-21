@@ -1,121 +1,96 @@
-import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { Typography, Button, Container, Paper, Grid, Box } from "@mui/material";
-import HealthAndSafetyIcon from "@mui/icons-material/HealthAndSafety";
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import ArticleIcon from '@mui/icons-material/Article';
-import Navbar from "../../components/navbar/Navbar";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { 
+  Typography, Container, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, Box
+} from "@mui/material";
+import moment from "moment";
+import { toast } from "react-toastify";
+import viewall from "../../services/Viewall";
+import HomeNavbar from "../../components/navbar/HomeNavbar";
 import "./home.css";
 
 const Home = () => {
-  const navigate = useNavigate();
   const { pid } = useParams();
+  const [records, setRecords] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleCreateRequest = () => {
-    navigate(`/createrequest/${pid}`);
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await viewall.pastdata(pid);
+        setRecords(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        toast.error("Failed to load diagnosis history");
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [pid]);
 
-  const handleViewDiagnosis = () => {
-    navigate(`/viewdiagnosis/${pid}`);
+  const getStatusBadgeStyle = (status) => {
+    const styles = {
+      Completed: { backgroundColor: "#e6f7ee", color: "#0d904f" },
+      "In Progress": { backgroundColor: "#fff4e5", color: "#ab6100" },
+      Pending: { backgroundColor: "#f8f9fa", color: "#666" }
+    };
+    return styles[status] || styles.Pending;
   };
 
   return (
     <>
-      <Navbar />
-      <Container maxWidth="md" sx={{ mt: 8 }}>
-        <Paper elevation={3} sx={{ p: 5, borderRadius: 3, textAlign: "center", backgroundColor: "#f8f9fa" }}>
-          <HealthAndSafetyIcon sx={{ fontSize: 80, color: "#4051B5", mb: 2 }} />
-          
-          <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, color: "#4051B5" }}>
-            Welcome to Teledermatology System
+      <HomeNavbar />
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Paper elevation={3} sx={{ p: 4, mb: 4, backgroundColor: "#f8f9fa" }}>
+          <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, color: "#4051B5", mb: 3 }}>
+            Previous Diagnoses
           </Typography>
-          
-          <Typography variant="body1" sx={{ mb: 5, color: "#555" }}>
-            Upload images of your skin condition for professional diagnosis by specialized dermatologists.
-            Get expert advice without leaving the comfort of your home.
-          </Typography>
-          
-          <Grid container spacing={4} justifyContent="center">
-            <Grid item xs={12} md={6}>
-              <Paper 
-                elevation={2} 
-                sx={{ 
-                  p: 3, 
-                  height: "100%", 
-                  display: "flex", 
-                  flexDirection: "column", 
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: "white",
-                  transition: "transform 0.3s",
-                  "&:hover": {
-                    transform: "translateY(-5px)",
-                  }
-                }}
-              >
-                <CloudUploadIcon sx={{ fontSize: 60, color: "#4051B5", mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  Create New Request
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 3, textAlign: "center", color: "#666" }}>
-                  Upload images of your skin condition to get professional diagnosis
-                </Typography>
-                <Button 
-                  variant="contained" 
-                  onClick={handleCreateRequest}
-                  sx={{ 
-                    backgroundColor: "#4051B5",
-                    "&:hover": {
-                      backgroundColor: "#303f9f"
-                    }
-                  }}
-                >
-                  Upload Image
-                </Button>
-              </Paper>
-            </Grid>
-            
-            <Grid item xs={12} md={6}>
-              <Paper 
-                elevation={2} 
-                sx={{ 
-                  p: 3, 
-                  height: "100%", 
-                  display: "flex", 
-                  flexDirection: "column", 
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: "white",
-                  transition: "transform 0.3s",
-                  "&:hover": {
-                    transform: "translateY(-5px)",
-                  }
-                }}
-              >
-                <ArticleIcon sx={{ fontSize: 60, color: "#4051B5", mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  View Your Diagnoses
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 3, textAlign: "center", color: "#666" }}>
-                  Check the status and results of your previous diagnosis requests
-                </Typography>
-                <Button 
-                  variant="outlined" 
-                  onClick={handleViewDiagnosis}
-                  sx={{ 
-                    borderColor: "#4051B5",
-                    color: "#4051B5",
-                    "&:hover": {
-                      borderColor: "#303f9f",
-                      backgroundColor: "rgba(64, 81, 181, 0.04)"
-                    }
-                  }}
-                >
-                  View Diagnoses
-                </Button>
-              </Paper>
-            </Grid>
-          </Grid>
+          {loading ? (
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <CircularProgress sx={{ color: "#4051B5" }} />
+            </Box>
+          ) : records.length === 0 ? (
+            <Paper elevation={2} sx={{ p: 4, textAlign: "center" }}>
+              <Typography variant="body1" color="textSecondary">
+                No previous diagnoses found
+              </Typography>
+            </Paper>
+          ) : (
+            <TableContainer component={Paper} elevation={2}>
+              <Table>
+                <TableHead sx={{ backgroundColor: "#e8eaf6" }}>
+                  <TableRow>
+                    <TableCell>Appointment ID</TableCell>
+                    <TableCell>Date</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Doctor Comments</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {records.map((record) => (
+                    <TableRow key={record.aid}>
+                      <TableCell>{record.aid}</TableCell>
+                      <TableCell>{moment(record.createdate).format("MMM D, YYYY")}</TableCell>
+                      <TableCell>
+                        <Box sx={{ 
+                          display: "inline-block",
+                          px: 1.5,
+                          py: 0.5,
+                          borderRadius: 1,
+                          ...getStatusBadgeStyle(record.status),
+                          fontWeight: 500
+                        }}>
+                          {record.status || "Pending"}
+                        </Box>
+                      </TableCell>
+                      <TableCell>{record.dcomments || "No comments yet"}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
         </Paper>
       </Container>
     </>

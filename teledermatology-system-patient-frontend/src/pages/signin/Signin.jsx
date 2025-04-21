@@ -9,7 +9,9 @@ import {
   Link,
   Paper,
   Alert,
-  CircularProgress
+  CircularProgress,
+  Checkbox,
+  FormControlLabel
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { toast } from "react-toastify";
@@ -19,28 +21,29 @@ import MyContext from "../../components/MyContext/MyContext";
 const Signin = () => {
   const navigate = useNavigate();
   const { setPid } = useContext(MyContext);
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleSignin = async (e) => {
     e.preventDefault();
-    
-    if (!username || !password) {
-      setError("Please enter both username and password");
+
+    if (!email || !password) {
+      setError("Please enter both email and password");
       return;
     }
-    
+
     setLoading(true);
     setError("");
-    
+
     try {
       const response = await signin.signinUser({
-        username,
+        username: email,
         password
       });
-      
+
       if (response.status === 200 && response.data && response.data.pid) {
         setPid(response.data.pid);
         localStorage.setItem("pid", response.data.pid);
@@ -83,38 +86,28 @@ const Signin = () => {
             width: "100%"
           }}
         >
-          <Box
-            sx={{
-              backgroundColor: "#4051B5",
-              borderRadius: "50%",
-              width: 40,
-              height: 40,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              mb: 1
-            }}
-          >
-            <LockOutlinedIcon sx={{ color: "white" }} />
-          </Box>
-          <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
-            Patient Sign In
+          <LockOutlinedIcon sx={{ color: "#4051B5", fontSize: 40, mb: 1 }} />
+          <Typography component="h1" variant="h5" sx={{ mb: 1, fontWeight: 600 }}>
+            Welcome to DermaCare
           </Typography>
-          
+          <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+            Sign in to your account
+          </Typography>
+
           {error && (
             <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
               {error}
             </Alert>
           )}
-          
+
           <Box component="form" onSubmit={handleSignin} sx={{ width: "100%" }}>
             <TextField
               margin="normal"
               required
               fullWidth
-              label="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              label="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               autoFocus
             />
             <TextField
@@ -126,7 +119,19 @@ const Signin = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  color="primary"
+                />
+              }
+              label="Remember me"
+              sx={{ mt: 1 }}
+            />
+
             <Button
               type="submit"
               fullWidth
@@ -135,23 +140,23 @@ const Signin = () => {
               sx={{
                 mt: 3,
                 mb: 2,
-                backgroundColor: "#4051B5",
+                backgroundColor: "#1976d2",
                 "&:hover": {
-                  backgroundColor: "#303f9f"
+                  backgroundColor: "#1565c0"
                 }
               }}
             >
-              {loading ? <CircularProgress size={24} color="inherit" /> : "Sign In"}
+              {loading ? <CircularProgress size={24} color="inherit" /> : "SIGN IN"}
             </Button>
-            
+
             <Box sx={{ textAlign: "center" }}>
               <Link
                 href="#"
                 variant="body2"
                 onClick={() => navigate("/register")}
-                sx={{ color: "#4051B5" }}
+                sx={{ color: "#1976d2" }}
               >
-                Don't have an account? Sign up
+                Don't have an account? Register
               </Link>
             </Box>
           </Box>

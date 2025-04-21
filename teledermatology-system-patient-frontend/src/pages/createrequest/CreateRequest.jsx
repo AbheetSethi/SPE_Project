@@ -7,30 +7,25 @@ import {
   Paper,
   TextField,
   Typography,
-  Grid,
   CircularProgress,
   Alert,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import Navbar from "../../components/navbar/Navbar";
+import CreateRequestNavbar from "../../components/navbar/CreateRequestNavbar";
 import { toast } from "react-toastify";
 import createrequest from "../../services/Createrequest";
 import uploadImage from "../../services/Uploadimage";
-import "./createrequest.css";
+
+const UPLOAD_WIDTH = 320; // px, adjust as needed for your design
 
 const CreateRequest = () => {
   const navigate = useNavigate();
   const { pid } = useParams();
-  const [name, setName] = useState("");
   const [file, setFile] = useState(null);
   const [comments, setComments] = useState("");
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
-
-  const handleNameChange = (e) => {
-    setName(e.target.value);
-  };
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -38,7 +33,6 @@ const CreateRequest = () => {
       if (selectedFile.type.includes("image/")) {
         setFile(selectedFile);
         setErrorMsg("");
-        // Create a preview URL for the image
         const reader = new FileReader();
         reader.onloadend = () => {
           setPreviewUrl(reader.result);
@@ -57,8 +51,8 @@ const CreateRequest = () => {
   };
 
   const handleSubmit = async () => {
-    if (!name) {
-      setErrorMsg("Please enter your name");
+    if (!comments.trim()) {
+      setErrorMsg("Please enter your query");
       return;
     }
     if (!file) {
@@ -70,15 +64,12 @@ const CreateRequest = () => {
     setErrorMsg("");
 
     try {
-      // First create the request entry
       const createResponse = await createrequest.createRequest({
-        patientName: name,
         patientId: pid,
         comments: comments
       });
 
       if (createResponse.status === 200) {
-        // Then upload the image with the appointment ID
         const aid = createResponse.data.appointmentId;
         const formData = new FormData();
         formData.append("image", file);
@@ -89,6 +80,7 @@ const CreateRequest = () => {
         if (uploadResponse.status === 200) {
           toast.success("Request created successfully!");
           navigate(`/home/${pid}`);
+          window.location.reload();
         } else {
           toast.error("Failed to upload image");
         }
@@ -105,147 +97,151 @@ const CreateRequest = () => {
 
   return (
     <>
-      <Navbar />
-      <Container maxWidth="md" sx={{ mt: 5, mb: 5 }}>
+      <CreateRequestNavbar />
+      <Container maxWidth="sm" sx={{ mt: 6, mb: 6 }}>
         <Paper
           elevation={3}
           sx={{
             p: 4,
-            borderRadius: 2
+            borderRadius: 3,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            background: "linear-gradient(135deg, #e3eaff 0%, #f8f9fa 100%)"
           }}
         >
           <Typography
             variant="h4"
             gutterBottom
-            sx={{ fontWeight: 600, color: "#4051B5", mb: 1 }}
+            sx={{ fontWeight: 700, color: "#4051B5", mb: 2, textAlign: "center" }}
           >
             Create New Request
           </Typography>
           <Typography
             variant="subtitle1"
-            sx={{ color: "#555", mb: 4 }}
+            sx={{ color: "#555", mb: 4, textAlign: "center" }}
           >
-            Upload an image to create a new request for diagnosis
+            Upload an image and submit your query for diagnosis
           </Typography>
 
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Name"
-                variant="outlined"
-                value={name}
-                onChange={handleNameChange}
-                required
-                sx={{ mb: 2 }}
-              />
-            </Grid>
+          <Box sx={{ width: "100%" }}>
+            <TextField
+              fullWidth
+              label="Patient Query"
+              variant="outlined"
+              multiline
+              rows={6}
+              value={comments}
+              onChange={handleCommentsChange}
+              placeholder="Please describe your symptoms or concerns..."
+              sx={{
+                mb: 3,
+                fontSize: "1.1rem",
+                fontWeight: 500,
+              }}
+            />
 
-            <Grid item xs={12}>
+            <Box
+              sx={{
+                width: `${UPLOAD_WIDTH}px`,
+                margin: "0 auto",
+                border: "2px dashed #1976d2",
+                borderRadius: 3,
+                p: 2,
+                textAlign: "center",
+                backgroundColor: "#f5f7fa",
+                cursor: "pointer",
+                "&:hover": {
+                  borderColor: "#4051B5",
+                },
+                mb: 3,
+                transition: "border-color 0.3s",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: "110px",
+                boxSizing: "border-box", // Ensures border is included in width
+              }}
+              onClick={() => document.getElementById("file-upload").click()}
+            >
+              <input
+                type="file"
+                id="file-upload"
+                style={{ display: "none" }}
+                onChange={handleFileChange}
+                accept="image/*"
+              />
+              <CloudUploadIcon sx={{ fontSize: 40, color: "#1976d2", mb: 1 }} />
+              <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                {file ? file.name : "Choose file or drag & drop"}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                Supported formats: JPEG, PNG, JPG
+              </Typography>
+            </Box>
+
+            {previewUrl && (
               <Box
                 sx={{
-                  border: "2px dashed #ccc",
-                  borderRadius: 2,
-                  p: 3,
+                  mt: 2,
+                  mb: 3,
                   textAlign: "center",
-                  backgroundColor: "#fff",
-                  cursor: "pointer",
-                  "&:hover": {
-                    borderColor: "#4051B5",
-                  },
-                  mb: 2,
+                  width: `${UPLOAD_WIDTH}px`,
+                  margin: "0 auto"
                 }}
-                onClick={() => document.getElementById("file-upload").click()}
               >
-                <input
-                  type="file"
-                  id="file-upload"
-                  style={{ display: "none" }}
-                  onChange={handleFileChange}
-                  accept="image/*"
-                />
-                <CloudUploadIcon sx={{ fontSize: 60, color: "#4051B5", mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  {file ? file.name : "Choose file or drag & drop"}
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                  Image Preview:
                 </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Supported formats: JPEG, PNG, JPG
-                </Typography>
-              </Box>
-
-              {previewUrl && (
-                <Box
-                  sx={{
-                    mt: 2,
-                    mb: 3,
-                    textAlign: "center",
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "300px",
+                    borderRadius: 8,
+                    border: "1px solid #ddd",
                   }}
-                >
-                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                    Image Preview:
-                  </Typography>
-                  <img
-                    src={previewUrl}
-                    alt="Preview"
-                    style={{
-                      maxWidth: "100%",
-                      maxHeight: "300px",
-                      borderRadius: 8,
-                      border: "1px solid #ddd",
-                    }}
-                  />
-                </Box>
-              )}
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Patient Comments"
-                variant="outlined"
-                multiline
-                rows={4}
-                value={comments}
-                onChange={handleCommentsChange}
-                placeholder="Please describe your symptoms or concerns..."
-                sx={{ mb: 2 }}
-              />
-            </Grid>
-
-            {errorMsg && (
-              <Grid item xs={12}>
-                <Alert severity="error" sx={{ mb: 2 }}>
-                  {errorMsg}
-                </Alert>
-              </Grid>
+                />
+              </Box>
             )}
 
-            <Grid item xs={12} sx={{ textAlign: "center" }}>
-              <Button
-                variant="contained"
-                onClick={handleSubmit}
-                disabled={uploading}
-                sx={{
-                  mt: 2,
-                  px: 4,
-                  py: 1.5,
-                  fontSize: "1rem",
-                  borderRadius: "8px",
-                  textTransform: "none",
-                  backgroundColor: "#4051B5",
-                  "&:hover": {
-                    backgroundColor: "#303f9f",
-                  },
-                }}
-              >
-                {uploading ? (
-                  <CircularProgress size={24} color="inherit" />
-                ) : (
-                  "Create Request"
-                )}
-              </Button>
-            </Grid>
-          </Grid>
+            {errorMsg && (
+              <Alert severity="error" sx={{ mb: 2, width: `${UPLOAD_WIDTH}px`, margin: "0 auto" }}>
+                {errorMsg}
+              </Alert>
+            )}
+
+            <Button
+              variant="contained"
+              onClick={handleSubmit}
+              disabled={uploading}
+              sx={{
+                width: `${UPLOAD_WIDTH}px`,
+                margin: "0 auto",
+                mt: 2,
+                px: 0,
+                py: 1.5,
+                fontSize: "1.1rem",
+                borderRadius: "8px",
+                textTransform: "none",
+                background: "linear-gradient(90deg, #4051B5 60%, #1976d2 100%)",
+                fontWeight: 600,
+                boxShadow: "0 2px 8px rgba(64,81,181,0.08)",
+                "&:hover": {
+                  background: "linear-gradient(90deg, #303f9f 60%, #1565c0 100%)",
+                },
+                display: "block"
+              }}
+            >
+              {uploading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Create Request"
+              )}
+            </Button>
+          </Box>
         </Paper>
       </Container>
     </>
