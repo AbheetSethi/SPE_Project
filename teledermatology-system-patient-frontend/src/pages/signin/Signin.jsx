@@ -1,27 +1,16 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Container,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Link,
-  Paper,
-  Alert,
-  CircularProgress,
-  Checkbox,
-  FormControlLabel
+  Container, Box, Typography, TextField, Button, Link, Paper, Alert,
+  CircularProgress, Checkbox, FormControlLabel
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { toast } from "react-toastify";
 import signin from "../../services/Signin";
-import MyContext from "../../components/MyContext/MyContext";
 
 const Signin = () => {
   const navigate = useNavigate();
-  const { setPid } = useContext(MyContext);
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState(""); // Changed from email to username
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -30,8 +19,8 @@ const Signin = () => {
   const handleSignin = async (e) => {
     e.preventDefault();
 
-    if (!email || !password) {
-      setError("Please enter both email and password");
+    if (!username || !password) {
+      setError("Please enter both username and password");
       return;
     }
 
@@ -39,24 +28,20 @@ const Signin = () => {
     setError("");
 
     try {
-      const response = await signin.signinUser({
-        username: email,
-        password
-      });
+      const response = await signin.signinUser({ username, password });
 
       if (response.status === 200 && response.data && response.data.pid) {
-        setPid(response.data.pid);
-        localStorage.setItem("pid", response.data.pid);
-        localStorage.setItem("token", response.data.token);
+        const { pid } = response.data;
         toast.success("Login successful!");
-        navigate(`/home/${response.data.pid}`);
-      } else {
+        navigate(`/home/${pid}`);
+      }
+      else {
         setError("Invalid credentials. Please try again.");
       }
     } catch (err) {
       console.error("Login error:", err);
-      if (err.response && err.response.data && err.response.data.message) {
-        setError(err.response.data.message);
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
       } else {
         setError("Login failed. Please check your credentials and try again.");
       }
@@ -105,11 +90,13 @@ const Signin = () => {
               margin="normal"
               required
               fullWidth
-              label="Email Address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              label="Username"
+              value={username} // ✅ Use the state variable you defined
+              onChange={(e) => setUsername(e.target.value)}
               autoFocus
             />
+
+            
             <TextField
               margin="normal"
               required

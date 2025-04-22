@@ -1,10 +1,13 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8092/api';
+// Use Flask's default port and no '/api' prefix
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const signinUser = async (credentials) => {
   try {
-    const response = await axios.post(`${API_URL}/auth/login`, credentials, {
+    // Use '/verify' as per your Flask backend
+    console.log(credentials)
+    const response = await axios.post(`${API_URL}/verify`, credentials, {
       headers: {
         'Content-Type': 'application/json',
       },

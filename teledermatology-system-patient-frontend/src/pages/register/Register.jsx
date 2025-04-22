@@ -22,7 +22,7 @@ const Register = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -30,7 +30,7 @@ const Register = () => {
     e.preventDefault();
     
     // Basic validation
-    if (!username || !password || !email || !fullName) {
+    if (!username || !password || !email || !name) {
       setError("Please fill in all fields");
       return;
     }
@@ -48,10 +48,10 @@ const Register = () => {
         username,
         password,
         email,
-        fullName
+        name
       });
       
-      if (response.status === 200) {
+      if (response.status === 200 || response.status === 201) {
         toast.success("Registration successful! Please sign in.");
         navigate("/signin");
       } else {
@@ -121,8 +121,8 @@ const Register = () => {
                   required
                   fullWidth
                   label="Full Name"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   autoFocus
                 />
               </Grid>
