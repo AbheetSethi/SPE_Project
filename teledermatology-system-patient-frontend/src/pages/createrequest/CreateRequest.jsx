@@ -14,13 +14,13 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CreateRequestNavbar from "../../components/navbar/CreateRequestNavbar";
 import { toast } from "react-toastify";
 import createrequest from "../../services/Createrequest";
-import uploadImage from "../../services/Uploadimage";
 
-const UPLOAD_WIDTH = 320; // px, adjust as needed for your design
+const UPLOAD_WIDTH = 220;
 
 const CreateRequest = () => {
   const navigate = useNavigate();
   const { pid } = useParams();
+
   const [file, setFile] = useState(null);
   const [comments, setComments] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -29,67 +29,44 @@ const CreateRequest = () => {
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      if (selectedFile.type.includes("image/")) {
-        setFile(selectedFile);
-        setErrorMsg("");
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setPreviewUrl(reader.result);
-        };
-        reader.readAsDataURL(selectedFile);
-      } else {
-        setErrorMsg("Please select a valid image file");
-        setFile(null);
-        setPreviewUrl(null);
-      }
+    if (selectedFile?.type?.includes("image/")) {
+      setFile(selectedFile);
+      setErrorMsg("");
+      const reader = new FileReader();
+      reader.onloadend = () => setPreviewUrl(reader.result);
+      reader.readAsDataURL(selectedFile);
+    } else {
+      setErrorMsg("Please select a valid image file (JPEG, PNG, JPG)");
+      setFile(null);
+      setPreviewUrl(null);
     }
   };
 
-  const handleCommentsChange = (e) => {
-    setComments(e.target.value);
-  };
+  const handleCommentsChange = (e) => setComments(e.target.value);
 
   const handleSubmit = async () => {
-    if (!comments.trim()) {
-      setErrorMsg("Please enter your query");
-      return;
-    }
-    if (!file) {
-      setErrorMsg("Please upload an image");
-      return;
-    }
+    if (!comments.trim()) return setErrorMsg("Please enter your query");
+    if (!file) return setErrorMsg("Please upload an image");
 
     setUploading(true);
     setErrorMsg("");
 
     try {
-      const createResponse = await createrequest.createRequest({
+      const createRes = await createrequest.createRequest({
         patientId: pid,
-        comments: comments
+        comments,
+        image: file,
       });
 
-      if (createResponse.status === 200) {
-        const aid = createResponse.data.appointmentId;
-        const formData = new FormData();
-        formData.append("image", file);
-        formData.append("aid", aid);
-
-        const uploadResponse = await uploadImage.upload(formData);
-
-        if (uploadResponse.status === 200) {
-          toast.success("Request created successfully!");
-          navigate(`/home/${pid}`);
-          window.location.reload();
-        } else {
-          toast.error("Failed to upload image");
-        }
+      if (createRes.status === 200) {
+        toast.success("Request created successfully!");
+        navigate(`/home/${pid}`, { replace: true });
       } else {
         toast.error("Failed to create request");
       }
-    } catch (error) {
-      console.error("Error creating request:", error);
-      toast.error("An error occurred while creating your request");
+    } catch (err) {
+      console.error("Request error:", err);
+      toast.error("An unexpected error occurred.");
     } finally {
       setUploading(false);
     }
@@ -107,20 +84,16 @@ const CreateRequest = () => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            background: "linear-gradient(135deg, #e3eaff 0%, #f8f9fa 100%)"
+            background: "linear-gradient(135deg, #e3eaff 0%, #f8f9fa 100%)",
           }}
         >
           <Typography
             variant="h4"
-            gutterBottom
             sx={{ fontWeight: 700, color: "#4051B5", mb: 2, textAlign: "center" }}
           >
             Create New Request
           </Typography>
-          <Typography
-            variant="subtitle1"
-            sx={{ color: "#555", mb: 4, textAlign: "center" }}
-          >
+          <Typography variant="subtitle1" sx={{ mb: 4, color: "#555", textAlign: "center" }}>
             Upload an image and submit your query for diagnosis
           </Typography>
 
@@ -134,43 +107,30 @@ const CreateRequest = () => {
               value={comments}
               onChange={handleCommentsChange}
               placeholder="Please describe your symptoms or concerns..."
-              sx={{
-                mb: 3,
-                fontSize: "1.1rem",
-                fontWeight: 500,
-              }}
+              sx={{ mb: 3 }}
             />
 
             <Box
               sx={{
                 width: `${UPLOAD_WIDTH}px`,
-                margin: "0 auto",
+                mx: "auto",
                 border: "2px dashed #1976d2",
                 borderRadius: 3,
                 p: 2,
                 textAlign: "center",
                 backgroundColor: "#f5f7fa",
                 cursor: "pointer",
-                "&:hover": {
-                  borderColor: "#4051B5",
-                },
+                "&:hover": { borderColor: "#4051B5" },
                 mb: 3,
-                transition: "border-color 0.3s",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                minHeight: "110px",
-                boxSizing: "border-box", // Ensures border is included in width
               }}
               onClick={() => document.getElementById("file-upload").click()}
             >
               <input
-                type="file"
                 id="file-upload"
+                type="file"
                 style={{ display: "none" }}
-                onChange={handleFileChange}
                 accept="image/*"
+                onChange={handleFileChange}
               />
               <CloudUploadIcon sx={{ fontSize: 40, color: "#1976d2", mb: 1 }} />
               <Typography variant="body1" sx={{ fontWeight: 600 }}>
@@ -182,15 +142,7 @@ const CreateRequest = () => {
             </Box>
 
             {previewUrl && (
-              <Box
-                sx={{
-                  mt: 2,
-                  mb: 3,
-                  textAlign: "center",
-                  width: `${UPLOAD_WIDTH}px`,
-                  margin: "0 auto"
-                }}
-              >
+              <Box sx={{ textAlign: "center", mb: 3 }}>
                 <Typography variant="subtitle2" sx={{ mb: 1 }}>
                   Image Preview:
                 </Typography>
@@ -208,39 +160,33 @@ const CreateRequest = () => {
             )}
 
             {errorMsg && (
-              <Alert severity="error" sx={{ mb: 2, width: `${UPLOAD_WIDTH}px`, margin: "0 auto" }}>
+              <Alert severity="error" sx={{ mb: 2, width: `${UPLOAD_WIDTH}px`, mx: "auto" }}>
                 {errorMsg}
               </Alert>
             )}
 
-            <Button
-              variant="contained"
-              onClick={handleSubmit}
-              disabled={uploading}
-              sx={{
-                width: `${UPLOAD_WIDTH}px`,
-                margin: "0 auto",
-                mt: 2,
-                px: 0,
-                py: 1.5,
-                fontSize: "1.1rem",
-                borderRadius: "8px",
-                textTransform: "none",
-                background: "linear-gradient(90deg, #4051B5 60%, #1976d2 100%)",
-                fontWeight: 600,
-                boxShadow: "0 2px 8px rgba(64,81,181,0.08)",
-                "&:hover": {
-                  background: "linear-gradient(90deg, #303f9f 60%, #1565c0 100%)",
-                },
-                display: "block"
-              }}
-            >
-              {uploading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                "Create Request"
-              )}
-            </Button>
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <Button
+                variant="contained"
+                disabled={uploading}
+                onClick={handleSubmit}
+                sx={{
+                  width: `${UPLOAD_WIDTH}px`,
+                  mt: 2,
+                  fontSize: "1.1rem",
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  background: "linear-gradient(90deg, #4051B5 60%, #1976d2 100%)",
+                  fontWeight: 600,
+                  "&:hover": {
+                    background: "linear-gradient(90deg, #303f9f 60%, #1565c0 100%)",
+                  },
+                }}
+              >
+                {uploading ? <CircularProgress size={24} color="inherit" /> : "Create Request"}
+              </Button>
+            </Box>
+
           </Box>
         </Paper>
       </Container>

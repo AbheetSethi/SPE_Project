@@ -50,17 +50,18 @@ const Register = () => {
         email,
         name
       });
-      
+      console.error(response.status);
       if (response.status === 200 || response.status === 201) {
         toast.success("Registration successful! Please sign in.");
         navigate("/signin");
-      } else {
+      }
+        else {
         setError("Registration failed. Please try again.");
       }
     } catch (err) {
       console.error("Registration error:", err);
-      if (err.response && err.response.data && err.response.data.message) {
-        setError(err.response.data.message);
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
       } else {
         setError("Registration failed. Please try again later.");
       }

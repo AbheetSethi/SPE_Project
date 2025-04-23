@@ -1,16 +1,24 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8092/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
-const createRequest = async (requestData) => {
+const createRequest = async ({ patientId, comments, image }) => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.post(`${API_URL}/request/create`, requestData, {
+    const formData = new FormData();
+
+    formData.append('patientId', patientId);
+    formData.append('comments', comments);
+
+    if (image) {
+      formData.append('image', image);
+    }
+
+    const response = await axios.post(`${API_URL}/create-request`, formData, {
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'multipart/form-data',
       },
     });
+
     return response;
   } catch (error) {
     console.error('Error creating request:', error);
