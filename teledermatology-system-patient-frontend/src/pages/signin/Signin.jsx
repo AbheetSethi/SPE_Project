@@ -10,7 +10,7 @@ import signin from "../../services/Signin";
 
 const Signin = () => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState(""); // Changed from email to username
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -39,7 +39,6 @@ const Signin = () => {
         setError("Invalid credentials. Please try again.");
       }
     } catch (err) {
-      console.error("Login error:", err);
       if (err.response && err.response.data && err.response.data.error) {
         setError(err.response.data.error);
       } else {
@@ -51,29 +50,41 @@ const Signin = () => {
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Paper
-        elevation={3}
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: 4,
-          borderRadius: 2
-        }}
-      >
-        <Box
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundColor: '#f5f8f7',
+        display: 'flex',
+        justifyContent: 'center',
+      }}
+    >
+      <Container maxWidth="xs" sx={{ mt: 8, mb: 2 }}>
+        <Paper
+          elevation={3}
           sx={{
+            p: 4,
+            borderRadius: 3,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            width: "100%"
           }}
         >
-          <LockOutlinedIcon sx={{ color: "#4051B5", fontSize: 40, mb: 1 }} />
-          <Typography component="h1" variant="h5" sx={{ mb: 1, fontWeight: 600 }}>
-            Welcome to DermaCare
+          <Box
+            sx={{
+              backgroundColor: "#4051B5",
+              borderRadius: "50%",
+              width: 48,
+              height: 48,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              mb: 2,
+            }}
+          >
+            <LockOutlinedIcon sx={{ color: "white", fontSize: 28 }} />
+          </Box>
+          <Typography component="h1" variant="h5" sx={{ mb: 1, fontWeight: 600, textAlign: "center" }}>
+            Welcome to Teledermatology
           </Typography>
           <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
             Sign in to your account
@@ -91,12 +102,10 @@ const Signin = () => {
               required
               fullWidth
               label="Username"
-              value={username} // ✅ Use the state variable you defined
+              value={username}
               onChange={(e) => setUsername(e.target.value)}
               autoFocus
             />
-
-            
             <TextField
               margin="normal"
               required
@@ -124,13 +133,12 @@ const Signin = () => {
               fullWidth
               variant="contained"
               disabled={loading}
+              color="primary"
               sx={{
                 mt: 3,
                 mb: 2,
-                backgroundColor: "#1976d2",
-                "&:hover": {
-                  backgroundColor: "#1565c0"
-                }
+                fontWeight: 600,
+                fontSize: "1rem",
               }}
             >
               {loading ? <CircularProgress size={24} color="inherit" /> : "SIGN IN"}
@@ -141,15 +149,15 @@ const Signin = () => {
                 href="#"
                 variant="body2"
                 onClick={() => navigate("/register")}
-                sx={{ color: "#1976d2" }}
+                sx={{ color: "#4051B5" }}
               >
                 Don't have an account? Register
               </Link>
             </Box>
           </Box>
-        </Box>
-      </Paper>
-    </Container>
+        </Paper>
+      </Container>
+    </Box>
   );
 };
 

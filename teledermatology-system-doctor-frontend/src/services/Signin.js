@@ -1,20 +1,21 @@
-import axios from "axios";
-axios.defaults.withCredentials = true
-class Signin {
-    login(credentials) {
-        console.log(credentials)
-        return axios.post("http://localhost:8090/admin_end/api/v1/auth/authenticate",credentials,{
-                withCredentials: true,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin':'*',
-                    'Access-Control-Allow-Credentials':'true'
-                }
-            }
-        );
-    }
-}
+import axios from 'axios';
 
-const signin =new Signin()
-export default signin ;
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
+const signinDoctor = async (credentials) => {
+  try {
+    const response = await axios.post(`${API_URL}/doctor-verify`, credentials, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('Error signing in:', error);
+    throw error;
+  }
+};
+
+export default {
+  signinDoctor,
+};
